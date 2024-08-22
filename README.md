@@ -22,20 +22,20 @@ Supported language: zh-CN
 
 
 ## TODO
-[ ] Bug: can't open file from other app when running on real phone
+- [ ] Bug: can't open file from other app when running on real phone
 
-[ ] Feature: support file export
+- [ ] Feature: support file export
 
-[ ] Feature: should allow user to define title regex pattern & reload catalog
+- [ ] Feature: should allow user to define title regex pattern & reload catalog
 
-[ ] Feature: text editor
+- [ ] Feature: text editor
 
-[ ] Bug: should allow user to cancel countdown in reading
+- [ ] Bug: should allow user to cancel countdown in reading
 
-[ ] Feature: accept more file type (currently only plaintext in UTF-16)
+- [ ] Feature: accept more file type (currently only plaintext in UTF-16)
 
-[ ] Feature: support multiple languages (currently only mandarian)
+- [ ] Feature: support multiple languages (currently only mandarian)
 
-[ ] Feature: sort book with options, e.g., rating, author
+- [ ] Feature: sort book with options, e.g., rating, author
 
-[ ] Bug: In book profile page, the padding for comment editor component is odd
+- [ ] Bug: In book profile page, the padding for comment editor component is odd
