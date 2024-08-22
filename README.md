@@ -2,7 +2,7 @@
 
 This is an iOS application for e-book reading & listening. Implemented in SwiftUI and involves some components from UIKit. 
 
-Using Apple's built-in text-to-speech interface, the reading may be a bit influent. I will consider embedding a reading AI in the future.
+Using Apple's built-in text-to-speech interface, the reading may be not so fluent. I will consider embedding a reading AI in the future.
 
 The app is only for individual use.
 
