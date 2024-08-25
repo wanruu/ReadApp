@@ -15,8 +15,8 @@ struct BookInfoView: View {
     @State private var info = BookForInfo()
     @State private var isShowingUnsaveConfirm = false
     
-    @Environment(\.dismiss) var dismiss
-    @Environment(\.colorScheme) var colorScheme
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.colorScheme) private var colorScheme
     @Environment(\.modelContext) private var modelContext
 
     @Query(sort: [SortDescriptor(\Tag.name)]) private var tags: [Tag]

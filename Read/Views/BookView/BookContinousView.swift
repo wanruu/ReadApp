@@ -68,6 +68,9 @@ struct BookContinousView: View {
                 .toolbar(isShowingToolbar ? .visible : .hidden, for: .bottomBar)
                 .toolbar {
                     ToolbarItem(placement: .topBarTrailing) {
+                        Button("Info", systemImage: "exclamationmark.circle", action: { activeSheet = .info })
+                    }
+                    ToolbarItem(placement: .topBarTrailing) {
                         Button("设置", systemImage: "gear", action: { activeSheet = .setting })
                     }
                     ToolbarItem(placement: .bottomBar, content: bottomBarView)
@@ -93,6 +96,9 @@ struct BookContinousView: View {
                                         Button("关闭", action: { activeSheet = nil })
                                     }
                                 }
+                        case .info:
+                            BookInfoView(book: book)
+                            
                         }
                     } detail: {
                         Text("Book sheet")
@@ -105,6 +111,7 @@ struct BookContinousView: View {
     private enum ActiveSheet: Identifiable {
         case catalog
         case setting
+        case info
         var id: Int {
             hashValue
         }
@@ -117,7 +124,7 @@ struct BookContinousView: View {
             Button {
                 activeSheet = .catalog
             } label: {
-                Image(systemName: "list.bullet").bold()
+                Image(systemName: "list.bullet").imageScale(.large)
             }
             Spacer()
             Divider()
@@ -156,7 +163,7 @@ struct BookContinousView: View {
                     isShowingToolbar = false
                 }
             } label: {
-                Image(systemName: "play.circle")
+                Image(systemName: "play.circle").imageScale(.large)
             }
         }
     }
