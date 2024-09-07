@@ -38,4 +38,10 @@ Supported language: zh-CN
 
 - [ ] Feature: sort book with options, e.g., rating, author
 
-- [ ] Bug: In book profile page, the padding for comment editor component is odd
+- [ ] Bug: in book profile page, the padding for comment editor component is odd
+
+- [ ] Feature: present last read book at the top of list
+
+- [ ] Feature: user-customizable reading speed, tone and language
+
+- [ ] Feature: allow to turn to last/next paragraph in speech

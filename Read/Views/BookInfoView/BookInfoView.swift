@@ -19,8 +19,6 @@ struct BookInfoView: View {
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.modelContext) private var modelContext
 
-    @Query(sort: [SortDescriptor(\Tag.name)]) private var tags: [Tag]
-
     var body: some View {
         let hasChange = !info.isEqual(to: book)
         Form {
@@ -101,27 +99,27 @@ struct BookForInfo {
     var author: String
     var rating: Int
     var summary: String
-    var tags: Set<String>
+    var tags: [Tag]
     
     init(book: Book? = nil) {
         name = book?.name ?? ""
         author = book?.author ?? ""
         rating = book?.rating ?? 0
         summary = book?.summary ?? ""
-        tags = Set(book?.tags ?? [])
+        tags = (book?.tags ?? []).sorted(by: { $0.index < $1.index })
     }
     func save(to book: Book) {
         book.name = name
         book.author = author
         book.rating = rating
         book.summary = summary
-        book.tags = Array(tags)
+        book.tags = tags
     }
     func isEqual(to book: Book) -> Bool {
         return book.name == name &&
         book.author == author &&
         book.rating == rating &&
         book.summary == summary &&
-        Set(book.tags) == tags
+        book.tags == tags
     }
 }
