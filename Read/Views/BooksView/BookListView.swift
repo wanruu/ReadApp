@@ -9,99 +9,38 @@ import SwiftUI
 import SwiftData
 
 
-struct BookListOptions: Equatable {
-    enum SortOption: String, CaseIterable, Identifiable {
-        case createDate = "创建日期"
-        case viewDate = "浏览日期"
-        case author = "作者"
-        case title = "书名"
-        var id: String { self.rawValue }
-    }
-
-    enum GroupOption: String, CaseIterable, Identifiable {
-        case none = "无"
-        case author = "作者"
-        case rating = "评分"
-        case summary = "是否评论"
-        var id: String { self.rawValue }
-    }
-    
-    var sortOption: SortOption
-    var groupOption: GroupOption
-    
-    init() {
-        if let s = UserDefaults.standard.string(forKey: "bookSortOption"), let o = SortOption(rawValue: s) {
-            sortOption = o
-        } else {
-            sortOption = .createDate
-        }
-        if let g = UserDefaults.standard.string(forKey: "bookGroupOption"), let o = GroupOption(rawValue: g) {
-            groupOption = o
-        } else {
-            groupOption = .none
-        }
-    }
-    
-    public func save() {
-        UserDefaults.standard.setValue(self.sortOption.rawValue, forKey: "bookSortOption")
-        UserDefaults.standard.setValue(self.groupOption.rawValue, forKey: "bookGroupOption")
-    }
-    
-    public func handle(_ books: [Book]) -> [String: [Book]] {
-//        let sortedBooks = books.sorted { b1, b2 in
-//            switch sortOption {
-//            case .createDate:
-//                b1.timestamp < b2.timestamp
-//            case .viewDate:
-//                b1.timestamp < b2.timestamp
-//            case .author:
-//                b1.author < b2.author
-//            case .title:
-//                b1.name < b2.name
-//            }
-//        }
-        if groupOption == .rating {
-            return Dictionary(grouping: books) { book in book.rating == 0 ? "未评分" : "\(book.rating)分" }
-        } else if groupOption == .author {
-            return Dictionary(grouping: books) { book in book.author }
-        } else if groupOption == .summary {
-            return Dictionary(grouping: books) { book in book.summary.isEmpty ? "未评论" : "已评论" }
-        }
-        return ["": books]
-    }
-}
-
-
-struct BookListMenuView: View {
-    @Binding var options: BookListOptions
-
+struct _BookListItemView: View {
+    @State var book: Book
     var body: some View {
-        Menu("Options", systemImage: "ellipsis.circle") {
-            Section {
-                Menu {
-                    Picker("Options", selection: $options.groupOption) {
-                        ForEach(BookListOptions.GroupOption.allCases) { option in
-                            Text(option.rawValue).tag(option)
+        VStack(alignment: .leading) {
+            Text(book.name)
+            book.tags.isEmpty ? nil :
+            TagsContainer {
+                ForEach(book.tags) { tag in
+                    Text(tag.name)
+                        .font(.footnote)
+                        .padding(.vertical, 2)
+                        .padding(.horizontal, 4)
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 5).stroke(style: StrokeStyle(lineWidth: 1))
                         }
-                    }
-                } label: {
-                    Label("分组方式", systemImage: "rectangle.3.group")
-                    Text(options.groupOption.rawValue).font(.footnote).foregroundStyle(.secondary)
                 }
-//                Menu {
-//                    Picker("Options", selection: $options.sortOption) {
-//                        ForEach(BookListOptions.SortOption.allCases) { option in
-//                            Text(option.rawValue).tag(option)
-//                        }
-//                    }
-//                } label: {
-//                    Label("排序方式", systemImage: "arrow.up.arrow.down")
-//                    Text(options.sortOption.rawValue).font(.footnote).foregroundStyle(.secondary)
-//                }
+                .foregroundStyle(Color.secondary)
             }
-        }
-        .onChange(of: options) { _, newValue in
-            newValue.save()
+            HStack(spacing: 3) {
+                Text(book.author.isEmpty ? "?" : book.author)
+                Text("·")
+                Text(book.size.fileSizeDescription)
+                Text("·")
+                Text(book.rating == 0 ? "未评分" : "\(book.rating)分")
+                Spacer()
+                book.summary.isEmpty ? nil :
+                    Image(systemName: "message.fill")
+                        .resizable()
+                        .frame(width: 15, height: 15)
+            }
+            .font(.footnote)
+            .foregroundStyle(Color.secondary)
         }
     }
 }
@@ -132,36 +71,7 @@ struct BookListView: View {
                         NavigationLink {
                             BookContinousView(book: book)
                         } label: {
-                            VStack(alignment: .leading) {
-                                Text(book.name)
-                                book.tags.isEmpty ? nil :
-                                TagsContainer {
-                                    ForEach(book.tags) { tag in
-                                        Text(tag.name)
-                                            .font(.footnote)
-                                            .padding(.vertical, 2)
-                                            .padding(.horizontal, 4)
-                                            .overlay {
-                                                RoundedRectangle(cornerRadius: 5).stroke(style: StrokeStyle(lineWidth: 1))
-                                            }
-                                    }
-                                    .foregroundStyle(Color.secondary)
-                                }
-                                HStack(spacing: 3) {
-                                    Text(book.author.isEmpty ? "?" : book.author)
-                                    Text("·")
-                                    Text(book.size.fileSizeDescription)
-                                    Text("·")
-                                    Text(book.rating == 0 ? "未评分" : "\(book.rating)分")
-                                    Spacer()
-                                    book.summary.isEmpty ? nil :
-                                        Image(systemName: "message.fill")
-                                            .resizable()
-                                            .frame(width: 15, height: 15)
-                                }
-                                .font(.footnote)
-                                .foregroundStyle(Color.secondary)
-                            }
+                            _BookListItemView(book: book)
                         }
                         .swipeActions {
                             Button("Delete", systemImage: "trash.fill", role: .destructive) {
@@ -183,23 +93,30 @@ struct BookListView: View {
                     Text("Book detail")
                 }
             })
-            .alert("删除书本《\(bookToDelete?.name ?? "")》？", isPresented: $isShowingDeleteConfirm, actions: {
+            .alert("删除书本《\(bookToDelete?.name ?? "")》？", isPresented: $isShowingDeleteConfirm) {
                 Button("删除", role: .destructive) {
                     if let b = bookToDelete {
                         deleteBook(b)
                     }
                 }
-            })
+            }
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     BookListMenuView(options: $options)
                 }
                 ToolbarItemGroup(placement: .bottomBar) {
+                    Button("Import", systemImage: "square.and.arrow.down") {
+                        isShowingBookSelection = true
+                    }
+                    .fileImporter(isPresented: $isShowingBookSelection, allowedContentTypes: [.plainText], onCompletion: addBook)
                     Spacer()
                     Text("共 \(books.count) 本书").font(.footnote)
                     Spacer()
-                    Button("Import", systemImage: "square.and.arrow.down", action: { isShowingBookSelection = true })
-                        .fileImporter(isPresented: $isShowingBookSelection, allowedContentTypes: [.plainText], onCompletion: addBook)
+                    NavigationLink {
+                        SettingView()
+                    } label: {
+                        Image(systemName: "gear")
+                    }
                 }
             }
             .navigationTitle("书柜")
@@ -252,7 +169,7 @@ struct BookListView: View {
     }
 }
 
-#Preview {
-    BookListView()
-        .modelContainer(for: Book.self, inMemory: true)
-}
+//#Preview {
+//    BookListView()
+//        .modelContainer(for: Book.self, inMemory: true)
+//}
