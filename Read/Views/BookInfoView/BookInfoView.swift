@@ -120,6 +120,6 @@ struct BookForInfo {
         book.author == author &&
         book.rating == rating &&
         book.summary == summary &&
-        book.tags == tags
+        Set(book.tags) == Set(tags)
     }
 }
