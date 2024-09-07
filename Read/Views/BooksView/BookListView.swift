@@ -134,8 +134,33 @@ struct BookListView: View {
                         } label: {
                             VStack(alignment: .leading) {
                                 Text(book.name)
-                                Text(book.size.fileSizeDescription)
-                                    .font(.footnote).foregroundStyle(Color.secondary)
+                                book.tags.isEmpty ? nil :
+                                TagsContainer {
+                                    ForEach(book.tags) { tag in
+                                        Text(tag.name)
+                                            .font(.footnote)
+                                            .padding(.vertical, 2)
+                                            .padding(.horizontal, 4)
+                                            .overlay {
+                                                RoundedRectangle(cornerRadius: 5).stroke(style: StrokeStyle(lineWidth: 1))
+                                            }
+                                    }
+                                    .foregroundStyle(Color.secondary)
+                                }
+                                HStack(spacing: 3) {
+                                    Text(book.author.isEmpty ? "?" : book.author)
+                                    Text("·")
+                                    Text(book.size.fileSizeDescription)
+                                    Text("·")
+                                    Text(book.rating == 0 ? "未评分" : "\(book.rating)分")
+                                    Spacer()
+                                    book.summary.isEmpty ? nil :
+                                        Image(systemName: "message.fill")
+                                            .resizable()
+                                            .frame(width: 15, height: 15)
+                                }
+                                .font(.footnote)
+                                .foregroundStyle(Color.secondary)
                             }
                         }
                         .swipeActions {
@@ -145,7 +170,7 @@ struct BookListView: View {
                             }
                         }
                         .swipeActions(edge: .trailing) {
-                            Button("Edit", systemImage: "info.circle") { bookToEdit = book }
+                            Button("Info", systemImage: "info.circle") { bookToEdit = book }
                         }
                     }
                 }
@@ -196,6 +221,7 @@ struct BookListView: View {
     private func deleteBook(_ book: Book) {
         withAnimation {
             modelContext.delete(book)
+            try? modelContext.save()
         }
     }
     
@@ -216,6 +242,7 @@ struct BookListView: View {
                     modelContext.insert(newBook)
                     DispatchQueue.global().async {
                         newBook.inject(docData)
+                        try? modelContext.save()
                     }
                 }
             }

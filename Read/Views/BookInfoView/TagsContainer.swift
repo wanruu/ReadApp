@@ -9,8 +9,8 @@ import SwiftUI
 
 
 struct TagsContainer<Content: View>: View {
-    @State var horizontalSpacing: CGFloat = 10
-    @State var verticalSpacing: CGFloat = 8
+    @State var horizontalSpacing: CGFloat = 8
+    @State var verticalSpacing: CGFloat = 5
     @ViewBuilder let content: Content
 
     @State private var yRange: CGPoint = .zero
@@ -21,7 +21,6 @@ struct TagsContainer<Content: View>: View {
         
         GeometryReader { geo in
             Extract(content) { views in
-                
                 ZStack(alignment: .topLeading) {
                     ForEach(views) { view in
                         view
@@ -36,7 +35,6 @@ struct TagsContainer<Content: View>: View {
                                 } else {
                                     width -= d.width + horizontalSpacing
                                 }
-                                print("leading guide")
                                 return result
                             })
                             .alignmentGuide(.top, computeValue: { d in
@@ -44,7 +42,6 @@ struct TagsContainer<Content: View>: View {
                                 if view.id == views.last?.id {
                                     height = 0
                                 }
-                                print("top guide")
                                 return result
                             })
                             .background(GeometryReader { geometry in
@@ -55,14 +52,14 @@ struct TagsContainer<Content: View>: View {
                     }
                 }
                 .coordinateSpace(name: "tags")
-                
             }
         }
         .onPreferenceChange(TagPreferenceKey.self) { val in
-            yRange = val
-            print("----- preference change -----")
+            if abs((yRange.y - yRange.x) - (val.y - val.x)) > 1 {
+                yRange = val
+            }
         }
-        .frame(minHeight: yRange.y - yRange.x)
+        .frame(height: yRange.y - yRange.x)
     }
 }
 
