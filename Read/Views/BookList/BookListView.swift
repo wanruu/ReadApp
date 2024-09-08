@@ -14,31 +14,24 @@ struct _BookListItemView: View {
     var body: some View {
         VStack(alignment: .leading) {
             Text(book.name)
-            
-            HStack {
-                HStack(spacing: 2) {
-                    Text(book.author.isEmpty ? "?" : book.author)
-                    Text("·")
-                    Text(book.size.fileSizeDescription)
-                }
-                Spacer()
-                HStack(spacing: 5) {
-                    Image(systemName: "message")
-                        .resizable()
-                        .frame(width: 15, height: 15)
-                        .foregroundStyle(book.summary.isEmpty ? Color.clear : Color.secondary)
-                    Text(book.rating == 0 ? "未评分" : "\(book.rating)分")
-                }
+            HStack(spacing: 2) {
+                Text(book.author.isEmpty ? "?" : book.author)
+                Text("·")
+                Text(book.size.fileSizeDescription)
             }
             .font(.footnote)
             .foregroundStyle(Color.secondary)
             
             book.tags.isEmpty ? nil :
-            TagsContainer {
-                ForEach(book.tags) { tag in
-                    TagView(text: tag.name)
+                TagsContainer {
+                    ForEach(book.tags) { tag in
+                        TagView(text: "#" + tag.name)
+                    }
+                    book.rating == 0 ? nil :
+                    TagView(text: "\(book.rating)分")
+                    book.summary.isEmpty ? nil :
+                    TagView(text: "\(book.summary.count)字评论")
                 }
-            }
         }
     }
 }

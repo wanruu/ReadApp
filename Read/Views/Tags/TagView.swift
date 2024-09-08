@@ -9,10 +9,10 @@ import SwiftUI
 
 struct TagView: View {
     @State var text: String
-    @Environment(\.colorScheme) var colorSchema: ColorScheme
+    @Environment(\.colorScheme) private var colorSchema: ColorScheme
 
     var body: some View {
-        Text("#" + text)
+        Text(text)
             .font(.system(size: 10.5, weight: .bold))
             .padding(.vertical, 2)
             .padding(.horizontal, 4)
