@@ -52,10 +52,11 @@ struct TagsContainer<Content: View>: View {
                     }
                 }
                 .coordinateSpace(name: "tags")
+                .frame(height: yRange.y - yRange.x)
             }
         }
         .onPreferenceChange(TagPreferenceKey.self) { val in
-            if abs((yRange.y - yRange.x) - (val.y - val.x)) > 1 {
+            if abs((yRange.y - yRange.x) - (val.y - val.x) / (yRange.y - yRange.x)) > 0.05 {
                 yRange = val
             }
         }
