@@ -9,7 +9,7 @@ import SwiftUI
 
 struct TagView: View {
     @State var text: String
-    @Environment(\.colorScheme) private var colorSchema: ColorScheme
+    @Environment(\.colorScheme) private var colorScheme: ColorScheme
 
     var body: some View {
         Text(text)
@@ -19,7 +19,7 @@ struct TagView: View {
             .foregroundStyle(Color.secondary)
             .background(
                 RoundedRectangle(cornerRadius: 5)
-                    .foregroundStyle(Color(uiColor: colorSchema == .light ? .systemGray6 : .systemGray5))
+                    .foregroundStyle(Color(uiColor: colorScheme == .light ? .systemGray6 : .systemGray5))
             )
     }
 }

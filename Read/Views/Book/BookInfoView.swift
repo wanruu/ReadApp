@@ -35,7 +35,7 @@ struct BookInfoView: View {
                     .frame(minHeight: 200)
             }
             Section {
-                TagsPickerView(selections: $info.tags)
+                TagPickerView(selections: $info.tags)
             } header: {
                 Text("标签")
             } footer: {

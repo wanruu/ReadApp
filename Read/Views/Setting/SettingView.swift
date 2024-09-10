@@ -28,7 +28,16 @@ struct SettingView: View {
                     }
                 }
             }
+            Section {
+                NavigationLink {
+                    TagListView()
+                } label: {
+                    Label("标签管理", systemImage: "bookmark")
+                }
+            }
         }
+        .navigationTitle(Text("设置"))
+        .navigationBarTitleDisplayMode(.inline)
     }
 }
 

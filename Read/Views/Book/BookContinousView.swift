@@ -76,7 +76,7 @@ struct BookContinousView: View {
                     ToolbarItem(placement: .bottomBar, content: bottomBarView)
                 }
                 .sheet(item: $activeSheet) { item in
-                    NavigationSplitView {
+                    NavigationStack {
                         switch item {
                         case .catalog:
                             BookCatalogView(book: book, isChangingChapter: $isChangingChapter)
@@ -100,8 +100,6 @@ struct BookContinousView: View {
                             BookInfoView(book: book)
                             
                         }
-                    } detail: {
-                        Text("Book sheet")
                     }
                     .presentationDetents([.medium, .large])
                 }
