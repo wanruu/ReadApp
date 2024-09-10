@@ -80,7 +80,7 @@ struct BookContinousView: View {
                         switch item {
                         case .catalog:
                             BookCatalogView(book: book, isChangingChapter: $isChangingChapter)
-                                .navigationTitle(Text("目录"))
+                                .navigationTitle("目录")
                                 .navigationBarTitleDisplayMode(.inline)
                                 .toolbar {
                                     ToolbarItem(placement: .topBarTrailing) {
@@ -89,7 +89,7 @@ struct BookContinousView: View {
                                 }
                         case .setting:
                             BookSettingView()
-                                .navigationTitle(Text("设置"))
+                                .navigationTitle("设置")
                                 .navigationBarTitleDisplayMode(.inline)
                                 .toolbar {
                                     ToolbarItem(placement: .topBarTrailing) {

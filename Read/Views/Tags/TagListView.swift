@@ -32,7 +32,7 @@ struct TagListView: View {
                 }
             }
         }
-        .navigationTitle(Text("标签管理"))
+        .navigationTitle("标签管理")
         .navigationBarTitleDisplayMode(.inline)
     }
 }

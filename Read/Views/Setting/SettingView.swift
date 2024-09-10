@@ -36,7 +36,7 @@ struct SettingView: View {
                 }
             }
         }
-        .navigationTitle(Text("设置"))
+        .navigationTitle("设置")
         .navigationBarTitleDisplayMode(.inline)
     }
 }

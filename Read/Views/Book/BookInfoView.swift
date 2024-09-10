@@ -42,7 +42,7 @@ struct BookInfoView: View {
                 Text("共\(info.tags.count)个标签")
             }
         }
-        .navigationTitle(Text("书本信息"))
+        .navigationTitle("书本信息")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
