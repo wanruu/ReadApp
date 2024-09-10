@@ -50,12 +50,11 @@ struct BookListView: View {
                                 BookItemView(book: book)
                             }
                             .swipeActions {
-                                Button("Delete", systemImage: "trash.fill", role: .destructive) {
+                                Button("Delete", systemImage: "trash.fill") {
                                     bookToDelete = book
                                     isShowingDeleteConfirm = true
                                 }
-                            }
-                            .swipeActions(edge: .trailing) {
+                                .tint(.red)
                                 Button("Info", systemImage: "info.circle") { bookToEdit = book }
                             }
                         }
