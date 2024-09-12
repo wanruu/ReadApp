@@ -10,149 +10,155 @@ import SwiftData
 
 
 struct TagListView: View {
+    // Data
     @Query(sort: \Tag.index) private var tags: [Tag]
+    
+    // Edit/add tag
+    @State private var isShowingAlert = false
+    @State private var tagToEdit: Tag?
+    @State private var text: String = ""
+    
+    // Delete
+    @State private var isShowingConfirmation = false
+    @State private var tagToDelete: Tag?
+
+    @Environment(\.modelContext) private var modelContext
 
     var body: some View {
-        List {
-            ForEach(tags) { tag in
-                NavigationLink {
-                    List {
-                        ForEach(tag.books) { book in
-                            BookListView.BookItemView(book: book)
+        ZStack {
+            List {
+                ForEach(tags) { tag in
+                    NavigationLink {
+                        List {
+                            ForEach(tag.books) { book in
+                                BookListView.BookItemView(book: book)
+                            }
+                        }
+                        .navigationBarTitleDisplayMode(.inline)
+                    } label: {
+                        VStack(alignment: .leading) {
+                            Text("# " + tag.name)
+                            Text("共 \(tag.books.count) 本书")
+                                .foregroundStyle(Color.secondary)
+                                .font(.footnote)
                         }
                     }
-                    .navigationBarTitleDisplayMode(.inline)
-                } label: {
-                    VStack(alignment: .leading) {
-                        Text("# " + tag.name)
-                        Text("共 \(tag.books.count) 本书")
-                            .foregroundStyle(Color.secondary)
-                            .font(.footnote)
+                    .swipeActions {
+                        Button("Delete", systemImage: "trash") {
+                            isShowingConfirmation = true
+                            tagToDelete = tag
+                        }.tint(Color.red)
+                        Button("Edit", systemImage: "square.and.pencil") {
+                            isShowingAlert = true
+                            tagToEdit = tag
+                            text = tag.name
+                        }
                     }
+                }
+                .onMove(perform: move)
+            }
+            NewTagSheet(text: $text, isShowing: $isShowingAlert, onSubmit: {
+                Task {
+                    if let tag = tagToEdit {
+                        tag.name = text
+                    } else {
+                        let tag = Tag(index: (tags.last?.index ?? -1) + 1, name: text)
+                        modelContext.insert(tag)
+                    }
+                }
+            })
+        }
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button("添加") {
+                    isShowingAlert = true
+                    tagToEdit = nil
+                    text = ""
                 }
             }
         }
+        .confirmationDialog("", isPresented: $isShowingConfirmation, actions: {
+            Button("删除", role: .destructive) {
+                withAnimation {
+                    if let tag = tagToDelete {
+                        modelContext.delete(tag)
+                    }
+                }
+            }
+        }, message: {
+            Text("确定删除标签“\(tagToDelete?.name ?? "")”？")
+        })
         .navigationTitle("标签管理")
         .navigationBarTitleDisplayMode(.inline)
     }
+    
+    func move(from source: IndexSet, to destination: Int) {
+//        tags.move(fromOffsets: source, toOffset: destination)
+        // TODO
+    }
+    
+    
+    struct NewTagSheet: View {
+        @State var title: String = "标签"
+        @Binding var text: String
+        @Binding var isShowing: Bool
+        let onSubmit: (() -> Void)?
+        
+        @FocusState private var isFocused: Bool
+        @Environment(\.colorScheme) private var colorScheme
+
+        var body: some View {
+            ZStack(alignment: .bottom) {
+                if isShowing {
+                    Color.black
+                        .opacity(0.2)
+                        .ignoresSafeArea()
+                        .onTapGesture {
+                            withAnimation {
+                                isShowing = false
+                            }
+                        }
+                    VStack(spacing: 20) {
+                        HStack {
+                            Button("取消") {
+                                withAnimation {
+                                    isShowing = false
+                                }
+                            }
+                            Spacer()
+                            Text(title).bold()
+                            Spacer()
+                            Button("完成") {
+                                withAnimation {
+                                    isShowing = false
+                                    onSubmit?()
+                                }
+                            }
+                            .bold()
+                        }
+                        TextField("请输入标签", text: $text)
+                            .focused($isFocused)
+                            .textFieldStyle(.roundedBorder)
+                            .onSubmit {
+                                withAnimation {
+                                    isShowing = false
+                                    onSubmit?()
+                                }
+                            }
+                    }
+                    .padding(20)
+                    .frame(maxWidth: .infinity)
+                    .background(colorScheme == .light ? Color.white : Color(red: 28/255, green: 28/255, blue: 30/255))
+                    .clipShape(RoundedRectangle(cornerRadius: 15))
+                    .padding()
+                    .transition(.opacity.combined(with: .move(edge: .bottom)))
+                    .onAppear {
+                        isFocused = true
+                    }
+                }
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
+            .animation(.easeInOut, value: isShowing)
+        }
+    }
 }
-
-
-
-//struct _TagListView: View {
-//    @Query(sort: \Tag.index) private var tags: [Tag]
-//    @Environment(\.modelContext) private var modelContext
-//
-//    @State private var tagsToEdit: [_Tag] = []
-//    @FocusState private var focusedField: Int?
-//    @State private var editMode: EditMode = .inactive
-//
-//    var body: some View {
-//        List {
-//            if editMode.isEditing {
-//                ForEach($tagsToEdit) { tag in
-//                    let isLast = tag.id == tagsToEdit.last?.id
-//                    Label {
-//                        TextField("", text: tag.name)
-//                            .focused($focusedField, equals: tag.id)
-//                            .submitLabel(.next)
-//                            .onSubmit {
-//                                if isLast {
-//                                    if !tag.name.wrappedValue.isEmpty {
-//                                        tagsToEdit.append(_Tag(id: tag.id + 1, name: ""))
-//                                        focusedField = tagsToEdit.last?.id
-//                                    }
-//                                } else {
-//                                    if let idx = tagsToEdit.firstIndex(where: { $0.id == tag.id }) {
-//                                        focusedField = tagsToEdit[idx + 1].id
-//                                    }
-//                                }
-//                            }
-//                    } icon: {
-//                        Image(systemName: isLast ? "circle.dotted" : "circle")
-//                            .foregroundStyle(Color.secondary)
-//                    }
-//                }
-//            } else {
-//                ForEach(tags) { tag in
-//                    Label {
-//                        Text(tag.name)
-//                    } icon: {
-//                        Button {
-//                            if let idx = selections.firstIndex(of: tag) {
-//                                selections.remove(at: idx)
-//                            } else {
-//                                selections.append(tag)
-//                                selections.sort(by: { $0.index < $1.index })
-//                            }
-//                        } label: {
-//                            selections.contains(tag) ?
-//                            Image(systemName: "circle.inset.filled").foregroundStyle(Color.accentColor):
-//                            Image(systemName: "circle").foregroundStyle(Color.secondary)
-//                        }
-//                    }
-//                }
-//                .onDelete { indexSet in
-//                    withAnimation {
-//                        for index in indexSet {
-//                            modelContext.delete(tags[index])
-//                            selections.removeAll(where: { $0 == tags[index] })
-//                        }
-//                        do {
-//                            try modelContext.save()
-//                        } catch {
-//                            fatalError("Error")
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//        .toolbar {
-//            ToolbarItem(placement: .topBarTrailing) {
-//                if editMode.isEditing {
-//                    HStack {
-//                        Button("取消") {
-//                            editMode = .inactive
-//                        }
-//                        Button("保存") {
-//                            saveTags()
-//                            editMode = .inactive
-//                        }.bold()
-//                    }
-//                } else {
-//                    Button("编辑") {
-//                        tagsToEdit = tags.map({ _Tag(id: $0.index, name: $0.name) })
-//                        tagsToEdit.append(_Tag(id: (tagsToEdit.last?.id ?? -1) + 1, name: ""))
-//                        editMode = .active
-//                    }
-//                }
-//            }
-//        }
-//    }
-//
-//    private struct _Tag: Identifiable {
-//        var id: Int  // also index
-//        var name: String
-//    }
-//    
-//    private func saveTags() {
-//        withAnimation {
-//            let tagsToSave = Array(tagsToEdit[0..<tagsToEdit.count-1])
-//            for tag in tags {
-//                if let tagToSave = tagsToSave.first(where: { $0.id == tag.index }) {
-//                    tag.index = tagToSave.id
-//                    tag.name = tagToSave.name
-//                } else {
-//                    modelContext.delete(tag)
-//                }
-//            }
-//            
-//            let newTags = tagsToSave.filter({ !tags.map({ $0.index }).contains($0.id) })
-//            for newTag in newTags {
-//                let t = Tag(index: newTag.id, name: newTag.name)
-//                modelContext.insert(t)
-//            }
-//            try? modelContext.save()
-//        }
-//    }
-//}
