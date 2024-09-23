@@ -25,7 +25,7 @@ struct BookListView: View {
             if options.groupOption == .none {
                 ForEach(books) { book in
                     NavigationLink {
-                        BookContinousView(book: book)
+                        BookView(book: book)
                     } label: {
                         BookItemView(book: book)
                     }
@@ -45,7 +45,7 @@ struct BookListView: View {
                     Section(groupKey) {
                         ForEach(bookGroups[groupKey] ?? []) { book in
                             NavigationLink {
-                                BookContinousView(book: book)
+                                BookView(book: book)
                             } label: {
                                 BookItemView(book: book)
                             }

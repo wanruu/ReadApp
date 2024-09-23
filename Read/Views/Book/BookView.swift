@@ -1,5 +1,5 @@
 //
-//  BookContinousView.swift
+//  BookView.swift
 //  Read
 //
 //  Created by wanruuu on 10/8/2024.
@@ -17,7 +17,7 @@ struct ReadingStatus: Equatable {
     static let paused = ReadingStatus(isReading: true, isPaused: true)
 }
 
-struct BookContinousView: View {
+struct BookView: View {
     @Bindable var book: Book
     
     @State private var isShowingToolbar = false
