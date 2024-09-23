@@ -34,10 +34,12 @@ struct BookTableView: UIViewControllerRepresentable {
 
     func updateUIViewController(_ uiViewController: BookTableViewController, context: Context) {
         if isChangingChapter {  // Only call scrollTo when need to change chapter
-            let newIndexPath = IndexPath(row: book.lastParagraphIndex, section: book.lastChapterIndex)
-            uiViewController.tableView.scrollToRow(at: newIndexPath, at: .top, animated: true)
-            uiViewController.speechIndexPath = newIndexPath
             DispatchQueue.global().async {
+                let newIndexPath = IndexPath(row: book.lastParagraphIndex, section: book.lastChapterIndex)
+                DispatchQueue.main.async {
+                    uiViewController.tableView.scrollToRow(at: newIndexPath, at: .top, animated: true)
+                }
+                uiViewController.speechIndexPath = newIndexPath
                 isChangingChapter = false
             }
         }
