@@ -12,31 +12,35 @@ import SwiftData
 struct BookListView: View {
     // Data
     @Query var books: [Book]
-    @Binding var options: BookListOptions
+    
+    init(filter: (() -> Predicate<Book>)? = nil) {
+        _books = Query(filter: filter?())
+    }
+    
+    init(tagName: String) {
+        _books = Query(filter: #Predicate<Book>{ book in
+            book.tags.contains { _tag in
+                _tag.name == tagName
+            }
+        })
+    }
 
     // Edit or delete book
     @Environment(\.modelContext) private var modelContext
     @State private var bookToEdit: Book?
     @State private var bookToDelete: Book?
+    @State private var bookToImport: Book?
     @State private var isShowingDeleteConfirm = false
+    @State private var isShowingImporter = false
+    
+    // Menu
+    @State private var options: BookListOptions = .init()
 
     var body: some View {
         List {
             if options.groupOption == .none {
                 ForEach(books) { book in
-                    NavigationLink {
-                        BookView(book: book)
-                    } label: {
-                        BookItemView(book: book)
-                    }
-                    .swipeActions {
-                        Button("Delete", systemImage: "trash.fill") {
-                            bookToDelete = book
-                            isShowingDeleteConfirm = true
-                        }
-                        .tint(.red)
-                        Button("Info", systemImage: "info.circle") { bookToEdit = book }
-                    }
+                    BookItemView(book: book)
                 }
             } else {
                 let bookGroups = options.handle(books)
@@ -44,19 +48,7 @@ struct BookListView: View {
                 ForEach(groupKeys, id: \.self) { groupKey in
                     Section(groupKey) {
                         ForEach(bookGroups[groupKey] ?? []) { book in
-                            NavigationLink {
-                                BookView(book: book)
-                            } label: {
-                                BookItemView(book: book)
-                            }
-                            .swipeActions {
-                                Button("Delete", systemImage: "trash.fill") {
-                                    bookToDelete = book
-                                    isShowingDeleteConfirm = true
-                                }
-                                .tint(.red)
-                                Button("Info", systemImage: "info.circle") { bookToEdit = book }
-                            }
+                            BookItemView(book: book)
                         }
                     }
                 }
@@ -72,6 +64,12 @@ struct BookListView: View {
         }, message: {
             Text("确定删除《\(bookToDelete?.name ?? "")》？")
         })
+        .fileImporter(isPresented: $isShowingImporter, allowedContentTypes: [.plainText], onCompletion: updateBook)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                BookListMenuView(options: $options)
+            }
+        }
 
 //        .onAppear {
 //            NotificationCenter.default.addObserver(forName: .didReceiveSharedData, object: nil, queue: .main) { notification in
@@ -93,10 +91,26 @@ struct BookListView: View {
         }
     }
     
-    struct BookItemView: View {
-        @State var book: Book
-
-        var body: some View {
+    private func updateBook(result: Result<URL, Error>) {
+        do {
+            let fileURL = try result.get()
+            if let book = bookToImport, fileURL.startAccessingSecurityScopedResource() {
+                let docData  = try Data(contentsOf: fileURL)
+                withAnimation {
+                    DispatchQueue.global().async {
+                        book.inject(docData)
+                    }
+                }
+            }
+        } catch {
+            print ("Error occurred when reading \(error.localizedDescription)")
+        }
+    }
+    
+    private func BookItemView(book: Book) -> some View {
+        NavigationLink {
+            BookView(book: book)
+        } label: {
             VStack(alignment: .leading) {
                 Text(book.name)
                 HStack(spacing: 2) {
@@ -106,7 +120,6 @@ struct BookListView: View {
                 }
                 .font(.footnote)
                 .foregroundStyle(Color.secondary)
-                
                 if !book.tags.isEmpty {
                     TagsContainer {
                         ForEach(book.tags) { tag in
@@ -118,6 +131,22 @@ struct BookListView: View {
                         TagView(text: "\(book.summary.count)字评论")
                     }
                 }
+            }
+        }
+        .swipeActions {
+            Button("Delete", systemImage: "trash.fill") {
+                bookToDelete = book
+                isShowingDeleteConfirm = true
+            }
+            .tint(.red)
+            Button("Info", systemImage: "info.circle") {
+                bookToEdit = book
+            }
+        }
+        .swipeActions(edge: .leading) {
+            Button("Import", systemImage: "square.and.arrow.down") {
+                bookToImport = book
+                isShowingImporter = true
             }
         }
     }

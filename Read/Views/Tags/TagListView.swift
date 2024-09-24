@@ -29,11 +29,7 @@ struct TagListView: View {
             List {
                 ForEach(tags) { tag in
                     NavigationLink {
-                        List {
-                            ForEach(tag.books) { book in
-                                BookListView.BookItemView(book: book)
-                            }
-                        }
+                        BookListView(tagName: tag.name)
                         .navigationBarTitleDisplayMode(.inline)
                     } label: {
                         VStack(alignment: .leading) {

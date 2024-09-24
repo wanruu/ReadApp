@@ -14,9 +14,6 @@ struct ContentView: View {
     @State private var isShowingImporter = false
     @Environment(\.modelContext) private var modelContext
 
-    // Menu
-    @State private var options: BookListOptions = .init()
-    
     // Title
     @Query private var books: [Book]
     
@@ -33,14 +30,11 @@ struct ContentView: View {
 
     var body: some View {
         NavigationStack {
-            BookListView(_books: Query(filter: getPredicate()), options: $options)
+            BookListView(filter: getPredicate)
                 .scrollDismissesKeyboard(.immediately)
                 .searchable(text: $searchText)
                 .navigationTitle("书柜")
                 .toolbar {
-                    ToolbarItem(placement: .navigationBarTrailing) {
-                        BookListMenuView(options: $options)
-                    }
                     ToolbarItemGroup(placement: .bottomBar) {
                         Button("Import", systemImage: "square.and.arrow.down") {
                             isShowingImporter = true
