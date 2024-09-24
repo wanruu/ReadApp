@@ -96,11 +96,7 @@ struct BookListView: View {
             let fileURL = try result.get()
             if let book = bookToImport, fileURL.startAccessingSecurityScopedResource() {
                 let docData  = try Data(contentsOf: fileURL)
-                withAnimation {
-                    DispatchQueue.global().async {
-                        book.inject(docData)
-                    }
-                }
+                book.inject(docData)
             }
         } catch {
             print ("Error occurred when reading \(error.localizedDescription)")
