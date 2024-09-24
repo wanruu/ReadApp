@@ -38,13 +38,12 @@ struct BookListView: View {
 
     var body: some View {
         List {
-            if options.groupOption == .none {
-                ForEach(books) { book in
+            let (groupKeys, bookGroups) = options.handle(books)
+            if groupKeys.count == 1 && groupKeys.first == "" {
+                ForEach(bookGroups[""] ?? []) { book in
                     BookItemView(book: book)
                 }
             } else {
-                let bookGroups = options.handle(books)
-                let groupKeys = bookGroups.keys.sorted(by: { $0 < $1 })
                 ForEach(groupKeys, id: \.self) { groupKey in
                     Section(groupKey) {
                         ForEach(bookGroups[groupKey] ?? []) { book in
