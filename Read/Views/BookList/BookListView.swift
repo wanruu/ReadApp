@@ -115,7 +115,7 @@ struct BookListView: View {
                 }
                 .font(.footnote)
                 .foregroundStyle(Color.secondary)
-                if !book.tags.isEmpty {
+                if !book.tags.isEmpty || book.rating != 0 || !book.summary.isEmpty {
                     TagsContainer {
                         ForEach(book.tags) { tag in
                             TagView(text: "#" + tag.name)
