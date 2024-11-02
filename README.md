@@ -1,47 +1,27 @@
-# ReadApp
+# 📖 ReadApp
 
-This is an iOS application for e-book reading & listening. Implemented in SwiftUI and involves some components from UIKit. 
+## 💡 Introduction
 
-Using Apple's built-in text-to-speech interface, the reading may be not so fluent. I will consider embedding a reading AI in the future.
+This is an **iOS** application for e-book management. Implemented in **SwiftUI** and involves some components from **UIKit**. Use **SwiftData** for data management.
 
-The app is only for individual use.
+Using Apple's built-in text-to-speech interface, the reading may be not so fluent.
 
+## ✨ Features
 
-## Features
+### Book import & override
 
-### File import
-Target types: plaintext file in UTF-16.
-
-
-### Chapter split
-Automatically detect chapter titles and split the text into multiple sections.
-
+Accept plain text files with different encodings. Automatically detect chapter titles.
+Left swipe to override existing book with a new file.
 
 ### Text to speech
-Supported language: zh-CN
 
+Supported language: zh-CN.
 
-## TODO
-- [ ] Bug: can't open file from other app when running on real phone
+Auto stop: 15 mins, 30 mins, 45 mins, 60 mins, 90 mins.
 
-- [ ] Feature: support file export
+### Book management
 
-- [ ] Feature: should allow user to define title regex pattern & reload catalog
+Title, author, rating, summary, tags.
 
-- [ ] Feature: text editor
-
-- [ ] Bug: should allow user to cancel countdown in reading
-
-- [ ] Feature: accept more file type (currently only plaintext in UTF-16)
-
-- [ ] Feature: support multiple languages (currently only mandarian)
-
-- [ ] Feature: sort book with options, e.g., rating, author
-
-- [ ] Bug: in book profile page, the padding for comment editor component is odd
-
-- [ ] Feature: present last read book at the top of list
-
-- [ ] Feature: user-customizable reading speed, tone and language
-
-- [ ] Feature: allow to turn to last/next paragraph in speech
+## ⏳ Progress
+https://trello.com/b/PJ1OHrJG/readapp

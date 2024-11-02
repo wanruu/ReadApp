@@ -1,2 +1,4 @@
+.DS_Store
 Preview Content
-Read.xcodeproj/project.xcworkspace/xcuserdata
+xcuserdata/
+*.xcodeproj

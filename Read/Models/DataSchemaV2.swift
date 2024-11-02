@@ -59,43 +59,7 @@ enum DataSchemaV2: VersionedSchema {
         }
         
         public func inject(_ data: Data) {
-            (self.titles, self.paragraphs, self.size) = Book.extractContent(data)
-        }
-        
-        private static func extractContent(_ data: Data) -> ([String], [[String]], Int) {
-            let content = (String(data: data, encoding: .utf16) ?? "").replacing("　", with: "")
-            let paras = content.components(separatedBy: .newlines).filter { str in str != "" }
-            
-            // Extract titles
-            // TODO: allow user to decide title pattern
-            let pattern = /^第[0-9一二三四五六七八九十零百千]+章.*/
-            let titleItems = paras.enumerated().filter({ it in
-                it.element.firstMatch(of: pattern) != nil
-            })
-            var titles = titleItems.map({ it in it.element })
-            var paragraphs = [[String]]()
-            
-            // Split paras by title
-            if titleItems.first?.offset != 0 {
-                titles.insert("前言", at: 0)
-                
-                var lastTitleIndex = 0
-                paragraphs = titleItems.map({ it in
-                    let para = Array(paras[lastTitleIndex..<it.offset])
-                    lastTitleIndex = it.offset
-                    return para
-                })
-                paragraphs.append(Array(paras[lastTitleIndex...]))
-            } else if titleItems.first?.offset == 0 {
-                var lastTitleIndex = 0
-                paragraphs = titleItems[1...].map({ it in
-                    let para = Array(paras[lastTitleIndex..<it.offset])
-                    lastTitleIndex = it.offset
-                    return para
-                })
-                paragraphs.append(Array(paras[lastTitleIndex...]))
-            }
-            return (titles, paragraphs, data.count)
+            (self.titles, self.paragraphs, self.size) = data.extractBook()
         }
     }
 }
