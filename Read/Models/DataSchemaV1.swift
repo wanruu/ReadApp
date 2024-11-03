@@ -62,6 +62,12 @@ enum DataSchemaV1: VersionedSchema {
             self.titles = titles
             self.paragraphs = paragraphs
             self.size = size
+            if (self.lastChapterIndex > self.titles.count) {
+                self.lastChapterIndex = self.titles.count - 1
+            }
+            if (self.lastParagraphIndex > self.paragraphs[self.lastChapterIndex].count) {
+                self.lastParagraphIndex = self.paragraphs[self.lastChapterIndex].count - 1
+            }
             print(self.titles.count, self.paragraphs.count, self.size)
         }
     }
